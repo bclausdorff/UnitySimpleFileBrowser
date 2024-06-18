@@ -535,7 +535,7 @@ namespace SimpleFileBrowser
 		internal RectTransform rectTransform;
 		private Canvas canvas;
 
-		private FileAttributes ignoredFileAttributes = FileAttributes.System;
+		private FileAttributes ignoredFileAttributes = FileAttributes.System | FileAttributes.Directory;
 
 		private FileSystemEntry[] allFileEntries;
 		private readonly List<FileSystemEntry> validFileEntries = new List<FileSystemEntry>();

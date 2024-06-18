@@ -53,6 +53,7 @@ namespace SimpleFileBrowser
 			deleteButton.gameObject.SetActive( deleteButtonVisible );
 			renameButton.gameObject.SetActive( renameButtonVisible );
 			selectAllButtonSeparator.SetActive( !deselectAllButtonVisible );
+			createFolderButton.gameObject.SetActive( false );
 
 			rectTransform.anchoredPosition = position;
 			gameObject.SetActive( true );
