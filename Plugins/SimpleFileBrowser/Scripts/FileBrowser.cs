@@ -590,10 +590,30 @@ namespace SimpleFileBrowser
 
 		// Required in RefreshFiles() function
 		private PointerEventData nullPointerEventData;
+		
+		[SerializeField] private Toggle hideUsernameToggle;
 		#endregion
 
 		#region Properties
 		private string m_currentPath = string.Empty;
+		
+		private string m_redactedCurrentPath
+		{
+			get
+			{
+				if (!hideUsernameToggle.isOn)
+					return m_currentPath;
+				
+				// todo linux support
+#if UNITY_EDITOR_OSX || ( !UNITY_EDITOR && UNITY_STANDALONE_OSX )
+				return "/Users/<your-username>/Documents/Oddada";
+#else
+				// default to windows path
+				return @"C:\Users\<your-username>\Documents\Oddada";
+#endif
+			}
+		}
+		
 		private string CurrentPath
 		{
 			get { return m_currentPath; }
@@ -610,7 +630,7 @@ namespace SimpleFileBrowser
 
 				if( string.IsNullOrEmpty( value ) )
 				{
-					pathInputField.text = m_currentPath;
+					pathInputField.text = m_redactedCurrentPath;
 					return;
 				}
 
@@ -618,12 +638,12 @@ namespace SimpleFileBrowser
 				{
 					if( !FileBrowserHelpers.DirectoryExists( value ) )
 					{
-						pathInputField.text = m_currentPath;
+						pathInputField.text = m_redactedCurrentPath;
 						return;
 					}
 
 					m_currentPath = value;
-					pathInputField.text = m_currentPath;
+					pathInputField.text = m_redactedCurrentPath;
 
 					if( currentPathIndex == -1 || pathsFollowed[currentPathIndex] != m_currentPath )
 					{
@@ -860,6 +880,8 @@ namespace SimpleFileBrowser
 			filenameInputField.onValueChanged.AddListener( OnFilenameInputChanged );
 			filtersDropdown.onValueChanged.AddListener( OnFilterChanged );
 			showHiddenFilesToggle.onValueChanged.AddListener( OnShowHiddenFilesToggleChanged );
+			
+			hideUsernameToggle.onValueChanged.AddListener( OnHideUserNameToggleChanged );
 
 			allFilesFilter = new Filter( AllFilesFilterText );
 			filters.Add( allFilesFilter );
@@ -1757,6 +1779,11 @@ namespace SimpleFileBrowser
 
 			PersistFileEntrySelection();
 			RefreshFiles( false );
+		}
+		
+		private void OnHideUserNameToggleChanged(bool value)
+		{
+			pathInputField.text = m_redactedCurrentPath;
 		}
 
 		public void OnItemSelected( FileBrowserItem item, bool isDoubleClick )
