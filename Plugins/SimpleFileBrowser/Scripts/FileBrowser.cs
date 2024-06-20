@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using UnityEngine.Serialization;
 #if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
 using UnityEngine.InputSystem;
 #endif
@@ -591,7 +592,7 @@ namespace SimpleFileBrowser
 		// Required in RefreshFiles() function
 		private PointerEventData nullPointerEventData;
 		
-		[SerializeField] private Toggle hideUsernameToggle;
+		[SerializeField] private Toggle showUsernameToggle;
 		#endregion
 
 		#region Properties
@@ -601,7 +602,7 @@ namespace SimpleFileBrowser
 		{
 			get
 			{
-				if (!hideUsernameToggle.isOn)
+				if (showUsernameToggle.isOn)
 					return m_currentPath;
 				
 				// todo linux support
@@ -881,7 +882,7 @@ namespace SimpleFileBrowser
 			filtersDropdown.onValueChanged.AddListener( OnFilterChanged );
 			showHiddenFilesToggle.onValueChanged.AddListener( OnShowHiddenFilesToggleChanged );
 			
-			hideUsernameToggle.onValueChanged.AddListener( OnHideUserNameToggleChanged );
+			showUsernameToggle.onValueChanged.AddListener( OnShowUserNameToggleChanged );
 
 			allFilesFilter = new Filter( AllFilesFilterText );
 			filters.Add( allFilesFilter );
@@ -1781,7 +1782,7 @@ namespace SimpleFileBrowser
 			RefreshFiles( false );
 		}
 		
-		private void OnHideUserNameToggleChanged(bool value)
+		private void OnShowUserNameToggleChanged(bool value)
 		{
 			pathInputField.text = m_redactedCurrentPath;
 		}
