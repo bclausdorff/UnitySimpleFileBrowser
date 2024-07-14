@@ -607,10 +607,10 @@ namespace SimpleFileBrowser
 				
 				// todo linux support
 #if UNITY_EDITOR_OSX || ( !UNITY_EDITOR && UNITY_STANDALONE_OSX )
-				return "/Users/<your-username>/Documents/Oddada";
+				return "/Users/<your-username>/Documents/ODDADA";
 #else
 				// default to windows path
-				return @"C:\Users\<your-username>\Documents\Oddada";
+				return @"C:\Users\<your-username>\Documents\ODDADA";
 #endif
 			}
 		}
