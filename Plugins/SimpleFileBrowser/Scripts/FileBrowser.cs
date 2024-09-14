@@ -936,6 +936,11 @@ namespace SimpleFileBrowser
 			onClickFilenameInputField?.Invoke();
 		}
 		
+		public static void UpdateFilename(string filename)
+		{
+			Instance.filenameInputField.text = filename;
+		}
+		
 		private void OnRectTransformDimensionsChange()
 		{
 			canvasDimensionsChanged = true;
