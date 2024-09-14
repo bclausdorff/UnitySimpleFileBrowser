@@ -940,6 +940,11 @@ namespace SimpleFileBrowser
 		{
 			Instance.filenameInputField.text = filename;
 		}
+
+		public static string GetFilename()
+		{
+			return Instance.filenameInputField.text;
+		}
 		
 		private void OnRectTransformDimensionsChange()
 		{
