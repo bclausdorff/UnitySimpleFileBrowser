@@ -827,9 +827,16 @@ namespace SimpleFileBrowser
 #if UNITY_EDITOR || UNITY_ANDROID
 		public delegate void AndroidSAFDirectoryPickCallback( string rawUri, string name );
 #endif
+		
+		public delegate void OnShow();
+
+		public delegate void OnClickFilenameInputField();
 
 		private OnSuccess onSuccess;
 		private OnCancel onCancel;
+		
+		private OnShow onShow;
+		private OnClickFilenameInputField onClickFilenameInputField;
 		#endregion
 
 		#region Messages
@@ -1395,7 +1402,7 @@ namespace SimpleFileBrowser
 				}
 			}
 		}
-
+		
 		private void OnMoreOptionsButtonClicked()
 		{
 			ShowContextMenuAt( rectTransform.InverseTransformPoint( moreOptionsContextMenuPosition.position ), true );
@@ -1713,6 +1720,8 @@ namespace SimpleFileBrowser
 			OnSuccess _onSuccess = onSuccess;
 			onSuccess = null;
 			onCancel = null;
+			onShow = null;
+			onClickFilenameInputField = null;
 
 			if( _onSuccess != null )
 				_onSuccess( paths );
@@ -1731,6 +1740,8 @@ namespace SimpleFileBrowser
 			OnCancel _onCancel = onCancel;
 			onSuccess = null;
 			onCancel = null;
+			onShow = null;
+			onClickFilenameInputField = null;
 
 			if( invokeCancelCallback && _onCancel != null )
 				_onCancel();
@@ -2053,12 +2064,14 @@ namespace SimpleFileBrowser
 			Result = null;
 
 			gameObject.SetActive( true );
-
+			
 			CurrentPath = GetInitialPath( initialPath );
 
 			filenameInputField.text = initialFilename ?? string.Empty;
 			filenameInputField.interactable = true;
 			filenameImage.color = m_skin.InputFieldNormalBackgroundColor;
+			
+			onShow?.Invoke();
 		}
 
 		public void Hide()
@@ -2910,22 +2923,25 @@ namespace SimpleFileBrowser
 
 		#region File Browser Functions (static)
 		public static bool ShowSaveDialog( OnSuccess onSuccess, OnCancel onCancel,
+											OnShow onShow, OnClickFilenameInputField onClickFilenameInputField,
 										   PickMode pickMode, bool allowMultiSelection = false,
 										   string initialPath = null, string initialFilename = null,
 										   string title = "Save", string saveButtonText = "Save" )
 		{
-			return ShowDialogInternal( onSuccess, onCancel, pickMode, allowMultiSelection, pickMode != PickMode.Folders, initialPath, initialFilename, title, saveButtonText );
+			return ShowDialogInternal( onSuccess, onCancel, onShow, onClickFilenameInputField, pickMode, allowMultiSelection, pickMode != PickMode.Folders, initialPath, initialFilename, title, saveButtonText );
 		}
 
 		public static bool ShowLoadDialog( OnSuccess onSuccess, OnCancel onCancel,
+											OnShow onShow, OnClickFilenameInputField onClickFilenameInputField,
 										   PickMode pickMode, bool allowMultiSelection = false,
 										   string initialPath = null, string initialFilename = null,
 										   string title = "Load", string loadButtonText = "Select" )
 		{
-			return ShowDialogInternal( onSuccess, onCancel, pickMode, allowMultiSelection, false, initialPath, initialFilename, title, loadButtonText );
+			return ShowDialogInternal( onSuccess, onCancel, onShow, onClickFilenameInputField, pickMode, allowMultiSelection, false, initialPath, initialFilename, title, loadButtonText );
 		}
 
 		private static bool ShowDialogInternal( OnSuccess onSuccess, OnCancel onCancel,
+			OnShow onShow, OnClickFilenameInputField onClickFilenameInputField,
 												PickMode pickMode, bool allowMultiSelection, bool acceptNonExistingFilename,
 												string initialPath, string initialFilename, string title, string submitButtonText )
 		{
@@ -2938,6 +2954,8 @@ namespace SimpleFileBrowser
 
 			Instance.onSuccess = onSuccess;
 			Instance.onCancel = onCancel;
+			Instance.onShow = onShow;
+			Instance.onClickFilenameInputField = onClickFilenameInputField;
 
 			Instance.PickerMode = pickMode;
 			Instance.AllowMultiSelection = allowMultiSelection;
@@ -2957,9 +2975,10 @@ namespace SimpleFileBrowser
 
 		public static IEnumerator WaitForSaveDialog( PickMode pickMode, bool allowMultiSelection = false,
 													 string initialPath = null, string initialFilename = null,
-													 string title = "Save", string saveButtonText = "Save" )
+													 string title = "Save", string saveButtonText = "Save",
+													 OnShow onShow = null, OnClickFilenameInputField onClickFilenameInputField = null)
 		{
-			if( !ShowSaveDialog( null, null, pickMode, allowMultiSelection, initialPath, initialFilename, title, saveButtonText ) )
+			if( !ShowSaveDialog( null, null, onShow, onClickFilenameInputField, pickMode, allowMultiSelection, initialPath, initialFilename, title, saveButtonText ) )
 				yield break;
 
 			while( Instance.gameObject.activeSelf )
@@ -2968,9 +2987,10 @@ namespace SimpleFileBrowser
 
 		public static IEnumerator WaitForLoadDialog( PickMode pickMode, bool allowMultiSelection = false,
 													 string initialPath = null, string initialFilename = null,
-													 string title = "Load", string loadButtonText = "Select" )
+													 string title = "Load", string loadButtonText = "Select",
+													 OnShow onShow = null, OnClickFilenameInputField onClickFilenameInputField = null)
 		{
-			if( !ShowLoadDialog( null, null, pickMode, allowMultiSelection, initialPath, initialFilename, title, loadButtonText ) )
+			if( !ShowLoadDialog( null, null, onShow, onClickFilenameInputField, pickMode, allowMultiSelection, initialPath, initialFilename, title, loadButtonText ) )
 				yield break;
 
 			while( Instance.gameObject.activeSelf )
