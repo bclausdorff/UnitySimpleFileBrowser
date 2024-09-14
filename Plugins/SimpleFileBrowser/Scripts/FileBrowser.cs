@@ -886,6 +886,7 @@ namespace SimpleFileBrowser
 			searchInputField.onValueChanged.AddListener( OnSearchStringChanged );
 			filenameInputField.onValidateInput += OnValidateFilenameInput;
 			filenameInputField.onValueChanged.AddListener( OnFilenameInputChanged );
+			AddClickListener(filenameInputField, OnInputFieldClick);
 			filtersDropdown.onValueChanged.AddListener( OnFilterChanged );
 			showHiddenFilesToggle.onValueChanged.AddListener( OnShowHiddenFilesToggleChanged );
 			
@@ -919,6 +920,22 @@ namespace SimpleFileBrowser
 #endif
 		}
 
+		private void AddClickListener(InputField inputField, OnClickFilenameInputField clickAction)
+		{
+			EventTrigger trigger = inputField.gameObject.AddComponent<EventTrigger>();
+
+			EventTrigger.Entry entry = new EventTrigger.Entry();
+			entry.eventID = EventTriggerType.PointerClick;
+			entry.callback.AddListener((data) => clickAction());
+
+			trigger.triggers.Add(entry);
+		}
+		
+		private void OnInputFieldClick()
+		{
+			onClickFilenameInputField?.Invoke();
+		}
+		
 		private void OnRectTransformDimensionsChange()
 		{
 			canvasDimensionsChanged = true;
